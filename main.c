@@ -1,16 +1,16 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 
 #include <stdio.h>
 #include <time.h>
-#include<signal.h>
-#include<unistd.h>
 
 #define TRUE 1
 #define FALSE 0
 
 #define SCREEN_WIDTH   800    
 #define SCREEN_HEIGHT  600
+
+#define FRAME_DURATION 16
 
 typedef unsigned char bool;
 
@@ -20,7 +20,7 @@ static SDL_Surface * surface = NULL;
 static SDL_Texture * texture = NULL;
 static TTF_Font * fonts = NULL; 
 
-static struct timespec t_start, t_end;
+unsigned int t_start, t_end, t_dl;
 
 bool InitializationComponents();
 bool ScreenRendering();
@@ -87,17 +87,24 @@ bool ScreenRendering()
                 text_rect_surface = {0, 0, text_surface -> w, text_surface -> h},
                 displaying_text_rect_surface = {SCREEN_WIDTH / 2 - text_surface -> w / 2, SCREEN_HEIGHT / 2 - text_surface -> h / 2, 0, 0},
                 displaying_fps_rect_surface = {0, 0, 0, 0};
+    unsigned int fps = 0;
     while (1)
     {
+        t_start = SDL_GetTicks();
         SDL_FillRect(surface, NULL, 0x000000);
-        clock_gettime(CLOCK_MONOTONIC, &t_start);
         SDL_BlitSurface(text_surface, &text_rect_surface, surface, &displaying_text_rect_surface);
-        SDL_UpdateWindowSurface(window);
-        clock_gettime(CLOCK_MONOTONIC, &t_end);
-        fps_surface = TTF_RenderText_Solid(fonts, (int_to_str(fps_str, 1000000000 / (t_end.tv_nsec - t_start.tv_nsec) + (t_end.tv_sec - t_start.tv_sec)), fps_str), color);
+        fps_surface = TTF_RenderText_Solid(fonts, (int_to_str(fps_str, fps), fps_str), color);
         fps_rect_surface = (SDL_Rect) {0, 0, fps_surface -> w, fps_surface -> h};
         SDL_BlitSurface(fps_surface, &fps_rect_surface, surface, &displaying_fps_rect_surface);
         SDL_UpdateWindowSurface(window);
+        SDL_FreeSurface(fps_surface);
+        t_dl = SDL_GetTicks();
+        if (t_dl - t_start < FRAME_DURATION)
+        {
+            SDL_Delay(FRAME_DURATION - (t_dl - t_start));
+        }
+        t_end = SDL_GetTicks();
+        fps = 1000 / (t_end - t_start);
     }
     SDL_FreeSurface(surface);
     SDL_DestroyWindow(window);
@@ -105,6 +112,7 @@ bool ScreenRendering()
     SDL_Quit();
     return 1;
 }
+
 void int_to_str(char * str, unsigned long value)
 {  
     #define START_POS 5
