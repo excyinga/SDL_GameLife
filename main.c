@@ -22,6 +22,10 @@ static TTF_Font * fonts = NULL;
 
 unsigned int t_start, t_end, t_dl;
 
+SDL_Color fg_color = { 255, 0, 0 };
+
+char fps_str[27] = "FPS: ";
+
 bool InitializationComponents();
 bool ScreenRendering();
 void ScreenUpdating();
@@ -53,8 +57,6 @@ bool InitializationComponents()
 }
 bool ScreenRendering()
 {    
-    SDL_Color color = {0, 255, 255};
-    char fps_str[27] = "FPS: ";
     window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (window == NULL)
     {
@@ -72,7 +74,7 @@ bool ScreenRendering()
     {
         printf("Fonts could not be created! SDL_Error: %s\n", TTF_GetError());
         return;
-    }
+    }    
     /* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     if (renderer == NULL ) 
     {
@@ -81,19 +83,28 @@ bool ScreenRendering()
     } */
 
     TTF_Font * fps_fonts = TTF_OpenFont("Sans.ttf", 10); 
-    SDL_Surface * text_surface = TTF_RenderText_Solid(fonts, "Hello, world!", color);
+
+    SDL_Surface * text_surface = TTF_RenderText_Solid(fonts, "Hello, world!", fg_color);
     SDL_Surface * fps_surface = NULL;
     SDL_Rect    fps_rect_surface,
                 text_rect_surface = {0, 0, text_surface -> w, text_surface -> h},
                 displaying_text_rect_surface = {SCREEN_WIDTH / 2 - text_surface -> w / 2, SCREEN_HEIGHT / 2 - text_surface -> h / 2, 0, 0},
                 displaying_fps_rect_surface = {0, 0, 0, 0};
+
     unsigned int fps = 0;
+
     while (1)
     {
         t_start = SDL_GetTicks();
-        SDL_FillRect(surface, NULL, 0x000000);
+        for (int i = 0; i != SCREEN_HEIGHT; i++)
+        {
+            for (int j = 0; j != SCREEN_WIDTH; j++)
+            {
+                *((int*)surface->pixels + j + i * SCREEN_WIDTH) = 0xFFFF00;
+            }
+        }
         SDL_BlitSurface(text_surface, &text_rect_surface, surface, &displaying_text_rect_surface);
-        fps_surface = TTF_RenderText_Solid(fonts, (int_to_str(fps_str, fps), fps_str), color);
+        fps_surface = TTF_RenderText_Solid(fonts, (int_to_str(fps_str, fps), fps_str), fg_color);
         fps_rect_surface = (SDL_Rect) {0, 0, fps_surface -> w, fps_surface -> h};
         SDL_BlitSurface(fps_surface, &fps_rect_surface, surface, &displaying_fps_rect_surface);
         SDL_UpdateWindowSurface(window);
@@ -106,13 +117,13 @@ bool ScreenRendering()
         t_end = SDL_GetTicks();
         fps = 1000 / (t_end - t_start);
     }
+
     SDL_FreeSurface(surface);
     SDL_DestroyWindow(window);
     TTF_Quit();
     SDL_Quit();
     return 1;
 }
-
 void int_to_str(char * str, unsigned long value)
 {  
     #define START_POS 5
