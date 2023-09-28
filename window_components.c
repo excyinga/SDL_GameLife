@@ -29,11 +29,13 @@ struct _position
     };
 };
 
+extern app_t* application;
+
 void SurfaceClearing(SDL_Surface*, SDL_Color const *);
-void TextRendering(app_t *, position *, SDL_Color const*, const char*);
+void TextRendering(app_t *, position *, SDL_Color, const char*);
 //char const * IntToStr_vFPS(unsigned long long);
 
-app_t * WindowInitialization(app_t * app)
+app_t * WindowInitialization()
 {
     if (SDL_Init(SDL_INIT_EVERYTHING))
     {
@@ -45,7 +47,7 @@ app_t * WindowInitialization(app_t * app)
         printf("Couldn't initialize SDL TTF: %s\n", TTF_GetError());
         return (void*) 0;
     }
-    app = malloc(sizeof(app_t));
+    app_t * app = malloc(sizeof(app_t));
     app->window = SDL_CreateWindow("Life", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if (app->window == NULL)
     {
@@ -68,8 +70,6 @@ app_t * WindowInitialization(app_t * app)
 }
 void ScreenRenderingAndUpdating(app_t * app)
 {
-    #define POS_CENTR_W(width) SCREEN_WIDTH / 2 - (width) / 2
-    #define POS_CENTR_H(height) SCREEN_HEIGHT / 2 - (height) / 2 
     uint_32 t_start, t_end, t_dl;
     SDL_Color fg = { 255, 0, 0 } /*RGB: RED*/, bg = { 0xFF, 0xBF, 0x00 }; /*BGR : BLUE*/
     uint_32 fps = 0;
@@ -78,8 +78,8 @@ void ScreenRenderingAndUpdating(app_t * app)
     {
         t_start = SDL_GetTicks();
         SurfaceClearing(app->surface, &bg);
-        //TextRendering(app->surface, &(position) {.x = 0, 0}, &fg, "FPS: "ToStr(fps));
-        TextRendering(app->surface, &(position) {CENTERED}, &fg, "Hello, world!");
+        TextRendering(app, &(position) {.x = 0, 0}, fg, "FPS: "ToStr(fps));
+        TextRendering(app, &(position) {CENTERED}, fg, "Hello, world!");
         SDL_UpdateWindowSurface(app->window);
         t_dl = SDL_GetTicks();
         if (t_dl - t_start < FRAME_DURATION)
@@ -112,12 +112,12 @@ void SurfaceClearing(SDL_Surface * surface, SDL_Color const * color_bg)
     }
     return;
 }
-void TextRendering(app_t * app, position * pos, SDL_Color const * text_color, const char * text)
+void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char * text)
 {
     #define POS_CENTR_W(width) SCREEN_WIDTH / 2 - (width) / 2
     #define POS_CENTR_H(height) SCREEN_HEIGHT / 2 - (height) / 2 
     SDL_Surface * text_surface; 
-    text_surface = TTF_RenderText_Solid(TTF_OpenFont("Sans.ttf", 24), text, *text_color);
+    text_surface = TTF_RenderText_Solid(application->fonts, text, text_color);
     if (pos->flag == CENTERED)
     {
         pos->x = POS_CENTR_W(text_surface->clip_rect.w);

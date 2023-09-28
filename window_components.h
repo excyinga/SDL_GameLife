@@ -11,7 +11,7 @@ struct _app
 	TTF_Font * fonts;
 };
 
-app_t * WindowInitialization(app_t *);
+app_t * WindowInitialization();
 void ScreenRenderingAndUpdating(app_t *);
 void WindowClearingAndDestroying(app_t*);
 
