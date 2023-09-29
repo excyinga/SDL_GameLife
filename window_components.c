@@ -6,9 +6,10 @@
 
 #define TRUE            1
 #define FALSE           0
-#define FRAME_DURATION  16
 #define SCREEN_WIDTH    800    
 #define SCREEN_HEIGHT   600
+#define FPS_VALUE_ARRAY_SIZE 28
+#define FRAME_DURATION  16
 
 typedef char unsigned uint_8;
 typedef int unsigned uint_32;
@@ -31,10 +32,12 @@ struct _position
     };
 };
 
+static char* text_HW = "Hello, world!";
+static char text_fps[FPS_VALUE_ARRAY_SIZE] = "FPS: ";
+
 void SurfaceClearing(SDL_Surface *, SDL_Color const *);
 void TextRendering(app_t *, position *, SDL_Color, const char*);
-char const * IntToStr(uint_32);
-char const* MergeStrings(char const *, char const *);
+char const * IntToStr_vFPS(char *, uint_32);
 
 app_t * WindowInitialization()
 {
@@ -74,7 +77,7 @@ void ScreenRenderingAndUpdating(app_t * app)
     uint_32 t_start, t_end, t_dl;
     SDL_Color fg = { 255, 0, 0 } /*RGB: RED*/, bg = { 0xFF, 0xBF, 0x00 }; /*BGR : BLUE*/
     uint_32 fps = 0;
-    SDL_Event* event = malloc(sizeof(SDL_Event));
+    SDL_Event* event = malloc(sizeof(SDL_Event));  
     while (TRUE)
     {
         t_start = SDL_GetTicks();
@@ -84,8 +87,8 @@ void ScreenRenderingAndUpdating(app_t * app)
             break;
         }
         SurfaceClearing(app->surface, &bg);
-        TextRendering(app, &(position) {.x = 0, 0}, fg, MergeStrings("FPS: ", IntToStr(fps)));
-        TextRendering(app, &(position) {CENTERED}, fg, "Hello, world!");
+        TextRendering(app, &(position) {.x = 0, 0}, fg, IntToStr_vFPS(text_fps, fps));
+        TextRendering(app, &(position) {CENTERED}, fg, text_HW);
         SDL_UpdateWindowSurface(app->window);
         t_dl = SDL_GetTicks();
         if (t_dl - t_start < FRAME_DURATION)
@@ -119,7 +122,6 @@ void SurfaceClearing(SDL_Surface * surface, SDL_Color const * color_bg)
 }
 void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char * text)
 {
-    
     SDL_Surface * text_surface; 
     text_surface = TTF_RenderText_Solid(app->fonts, text, text_color);
     if (pos->flag == CENTERED)
@@ -135,47 +137,23 @@ void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char
     SDL_FreeSurface(text_surface);
     return;
 }
-char const * IntToStr(uint_32 value) 
+char const * IntToStr_vFPS(char * str_value, uint_32 value) 
 {
-    uint_8 i = 0;
-    static char* str_value = NULL;
-    if (str_value)
-    {
-        free(str_value);
-        str_value = NULL;
-    }
-    str_value = malloc(sizeof(char) * 22);
+    printf("%d\n", value);
+    #define START_POS 5
+    uint_8 i = START_POS;
     for (; value != 0; i++, value /= 10)
     {
         str_value[i] = value % 10 + 48;
     }
     str_value[i] = '\0';
     uint_32 tmp;
-    for (int j = 0; i - 1 > j; i--, j++)
+    for (int j = START_POS; i - 1 > j; i--, j++)
     {
         tmp = str_value[j];
         str_value[j] = str_value[i - 1];
         str_value[i - 1] = tmp;
     }
+    #undef START_POS
     return str_value;
-}
-char const* MergeStrings(char const* str1, char const* str2)
-{
-    uint_32 str_len1 = 0;
-    uint_32 str_len2 = 0;
-    for (; str1[str_len1] != '\0'; str_len1++) {}
-    for (; str2[str_len2] != '\0'; str_len2++) {}
-    static char* merged_str = NULL;
-    if (merged_str)
-    {
-        free(merged_str);
-        merged_str = NULL;
-    }
-    uint_64 merged_str_len = str_len1 + str_len2 + 1;
-    merged_str = malloc(sizeof(char) * merged_str_len);
-    int i = 0;
-    for (; i < str_len1; i++) { merged_str[i] = str1[i]; }
-    for (; i < merged_str_len - 1; i++) { merged_str[i] = str2[i - str_len1]; }
-    merged_str[i] = '\0';
-    return merged_str;
 }

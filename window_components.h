@@ -13,6 +13,6 @@ struct _app
 
 app_t * WindowInitialization();
 void ScreenRenderingAndUpdating(app_t *);
-void WindowClearingAndDestroying(app_t*);
+void WindowClearingAndDestroying(app_t *);
 
 #endif
