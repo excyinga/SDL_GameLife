@@ -6,11 +6,12 @@
 
 #include "window_components.h"
 
-app_t * application;
+static app_t * application;
 
 int main() 
 {
-    if (!(application = WindowInitialization()))
+    application = WindowInitialization();
+    if (!application)
         return 1;
     ScreenRenderingAndUpdating(application);
     WindowClearingAndDestroying(application);

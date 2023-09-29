@@ -10,7 +10,9 @@
 #define SCREEN_WIDTH    800    
 #define SCREEN_HEIGHT   600
 
-typedef unsigned int uint_32;
+typedef char unsigned uint_8;
+typedef int unsigned uint_32;
+typedef long long unsigned uint_64;
 typedef enum _position_flags position_flags;
 typedef struct _position position;
 
@@ -29,11 +31,10 @@ struct _position
     };
 };
 
-extern app_t* application;
-
-void SurfaceClearing(SDL_Surface*, SDL_Color const *);
+void SurfaceClearing(SDL_Surface *, SDL_Color const *);
 void TextRendering(app_t *, position *, SDL_Color, const char*);
-//char const * IntToStr_vFPS(unsigned long long);
+char const * IntToStr(uint_32);
+char const* MergeStrings(char const *, char const *);
 
 app_t * WindowInitialization()
 {
@@ -73,12 +74,17 @@ void ScreenRenderingAndUpdating(app_t * app)
     uint_32 t_start, t_end, t_dl;
     SDL_Color fg = { 255, 0, 0 } /*RGB: RED*/, bg = { 0xFF, 0xBF, 0x00 }; /*BGR : BLUE*/
     uint_32 fps = 0;
-    #define ToStr(x) #x
+    SDL_Event* event = malloc(sizeof(SDL_Event));
     while (TRUE)
     {
         t_start = SDL_GetTicks();
+        SDL_PollEvent(event);
+        if (event->type == SDL_QUIT)
+        {
+            break;
+        }
         SurfaceClearing(app->surface, &bg);
-        TextRendering(app, &(position) {.x = 0, 0}, fg, "FPS: "ToStr(fps));
+        TextRendering(app, &(position) {.x = 0, 0}, fg, MergeStrings("FPS: ", IntToStr(fps)));
         TextRendering(app, &(position) {CENTERED}, fg, "Hello, world!");
         SDL_UpdateWindowSurface(app->window);
         t_dl = SDL_GetTicks();
@@ -89,7 +95,6 @@ void ScreenRenderingAndUpdating(app_t * app)
         t_end = SDL_GetTicks();
         fps = 1000 / (t_end - t_start);
     }
-    #undef ToStr(x)
     return;
 }
 void WindowClearingAndDestroying(app_t * app)
@@ -107,43 +112,70 @@ void SurfaceClearing(SDL_Surface * surface, SDL_Color const * color_bg)
     {
         for (int j = 0; j != SCREEN_WIDTH; j++)
         {
-            *((int*) surface->pixels + j + i * SCREEN_WIDTH) = *(int*) &color_bg;
+            *((int*) surface->pixels + j + i * SCREEN_WIDTH) = *(int*) &*color_bg;
         }
     }
     return;
 }
 void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char * text)
 {
-    #define POS_CENTR_W(width) SCREEN_WIDTH / 2 - (width) / 2
-    #define POS_CENTR_H(height) SCREEN_HEIGHT / 2 - (height) / 2 
+    
     SDL_Surface * text_surface; 
-    text_surface = TTF_RenderText_Solid(application->fonts, text, text_color);
+    text_surface = TTF_RenderText_Solid(app->fonts, text, text_color);
     if (pos->flag == CENTERED)
     {
+        #define POS_CENTR_W(width) SCREEN_WIDTH / 2 - (width) / 2
+        #define POS_CENTR_H(height) SCREEN_HEIGHT / 2 - (height) / 2 
         pos->x = POS_CENTR_W(text_surface->clip_rect.w);
         pos->y = POS_CENTR_H(text_surface->clip_rect.h);
+        #undef POS_CENTR_W(width)
+        #undef POS_CENTR_H(height)
     }
     SDL_BlitSurface(text_surface, &text_surface->clip_rect, app->surface, &(SDL_Rect) {pos->x, pos->y});
     SDL_FreeSurface(text_surface);
-    #undef POS_CENTR_W(width)
-    #undef POS_CENTR_H(height)
     return;
 }
-/* char const* IntToStr_vFPS(unsigned long long value)
+char const * IntToStr(uint_32 value) 
 {
-    int i = 0;
-    static char text[21];
+    uint_8 i = 0;
+    static char* str_value = NULL;
+    if (str_value)
+    {
+        free(str_value);
+        str_value = NULL;
+    }
+    str_value = malloc(sizeof(char) * 22);
     for (; value != 0; i++, value /= 10)
     {
-        text[i] = value % 10 + 48;
+        str_value[i] = value % 10 + 48;
     }
-    text[i] = '\0';
-    unsigned long long tmp;
+    str_value[i] = '\0';
+    uint_32 tmp;
     for (int j = 0; i - 1 > j; i--, j++)
     {
-        tmp = text[j];
-        text[j] = text[i - 1];
-        text[i - 1] = tmp;
+        tmp = str_value[j];
+        str_value[j] = str_value[i - 1];
+        str_value[i - 1] = tmp;
     }
-    return text;
-} */
+    return str_value;
+}
+char const* MergeStrings(char const* str1, char const* str2)
+{
+    uint_32 str_len1 = 0;
+    uint_32 str_len2 = 0;
+    for (; str1[str_len1] != '\0'; str_len1++) {}
+    for (; str2[str_len2] != '\0'; str_len2++) {}
+    static char* merged_str = NULL;
+    if (merged_str)
+    {
+        free(merged_str);
+        merged_str = NULL;
+    }
+    uint_64 merged_str_len = str_len1 + str_len2 + 1;
+    merged_str = malloc(sizeof(char) * merged_str_len);
+    int i = 0;
+    for (; i < str_len1; i++) { merged_str[i] = str1[i]; }
+    for (; i < merged_str_len - 1; i++) { merged_str[i] = str2[i - str_len1]; }
+    merged_str[i] = '\0';
+    return merged_str;
+}
