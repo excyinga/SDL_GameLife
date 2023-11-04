@@ -1,5 +1,5 @@
 #!/bin/bash
 
 set -ex
-gcc -o main.bin -lSDL2_ttf -lSDL2_image main.c `sdl2-config --cflags --libs`
+gcc -o main.bin -I. -lSDL2 -lSDL2_ttf -lSDL2_image main.c window_components.c
 ./main.bin

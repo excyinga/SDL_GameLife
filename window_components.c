@@ -1,14 +1,14 @@
 #include <stdio.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_ttf.h"
 #include "window_components.h"
 
 #define TRUE            1
 #define FALSE           0
 #define SCREEN_WIDTH    800    
 #define SCREEN_HEIGHT   600
-#define FPS_VALUE_ARRAY_SIZE 28
+#define FPS_VALUE_ARRAY_SIZE 29
 #define FRAME_DURATION  16
 
 typedef char unsigned uint_8;
@@ -32,7 +32,6 @@ struct _position
     };
 };
 
-static char* text_HW = "Hello, world!";
 static char text_fps[FPS_VALUE_ARRAY_SIZE] = "FPS: ";
 
 void SurfaceClearing(SDL_Surface *, SDL_Color const *);
@@ -74,21 +73,25 @@ app_t * WindowInitialization()
 }
 void ScreenRenderingAndUpdating(app_t * app)
 {
-    uint_32 t_start, t_end, t_dl;
-    SDL_Color fg = { 255, 0, 0 } /*RGB: RED*/, bg = { 0xFF, 0xBF, 0x00 }; /*BGR : BLUE*/
-    uint_32 fps = 0;
-    SDL_Event* event = malloc(sizeof(SDL_Event));  
-    while (TRUE)
+    void DrawingGrid(unsigned, SDL_Surface *);
+    uint_32 t_start, t_end, t_dl, fps = 0;;
+    SDL_Color bg = {255, 255, 255}, fg = {0, 0, 0};
+    uint_8 non_exit = 1;
+    SDL_Event event;
+    while (non_exit)
     {
         t_start = SDL_GetTicks();
-        SDL_PollEvent(event);
-        if (event->type == SDL_QUIT)
+        while(SDL_PollEvent(&event))
         {
-            break;
+            if (event.type == SDL_QUIT)
+            {
+                non_exit = 0;
+                break;
+            }
         }
         SurfaceClearing(app->surface, &bg);
+        DrawingGrid(100, app->surface);
         TextRendering(app, &(position) {.x = 0, 0}, fg, IntToStr_vFPS(text_fps, fps));
-        TextRendering(app, &(position) {CENTERED}, fg, text_HW);
         SDL_UpdateWindowSurface(app->window);
         t_dl = SDL_GetTicks();
         if (t_dl - t_start < FRAME_DURATION)
@@ -102,6 +105,7 @@ void ScreenRenderingAndUpdating(app_t * app)
 }
 void WindowClearingAndDestroying(app_t * app)
 {
+    TTF_CloseFont(app->fonts);
     SDL_FreeSurface(app->surface);
     SDL_DestroyWindow(app->window);
     TTF_Quit();
@@ -130,8 +134,8 @@ void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char
         #define POS_CENTR_H(height) SCREEN_HEIGHT / 2 - (height) / 2 
         pos->x = POS_CENTR_W(text_surface->clip_rect.w);
         pos->y = POS_CENTR_H(text_surface->clip_rect.h);
-        #undef POS_CENTR_W(width)
-        #undef POS_CENTR_H(height)
+        #undef POS_CENTR_W
+        #undef POS_CENTR_H
     }
     SDL_BlitSurface(text_surface, &text_surface->clip_rect, app->surface, &(SDL_Rect) {pos->x, pos->y});
     SDL_FreeSurface(text_surface);
@@ -156,4 +160,49 @@ char const * IntToStr_vFPS(char * str_value, uint_32 value)
     }
     #undef START_POS
     return str_value;
+}
+void DrawingGrid(unsigned grid_number, SDL_Surface * surface)
+{
+    void SetPixel(SDL_Surface *, int, int, int);
+    #define STEP_W SCREEN_WIDTH / grid_number
+    #define STEP_H SCREEN_HEIGHT / grid_number
+    for (int i = 0; i < SCREEN_HEIGHT; i++)
+    {
+        for (unsigned int pix = 0; pix <= grid_number; pix++)
+        {
+            if (pix == grid_number)
+            {
+                // * ((int *) surface->pixels + i * SCREEN_W + pix * STEP_W - 1) = 0;
+                SetPixel(surface, pix * STEP_W - 1, i, 0);
+            }
+            else
+            {
+                // * ((int *) surface->pixels + i * SCREEN_W + pix * STEP_W) = 0;
+                SetPixel(surface, pix * STEP_W, i, 0);
+            }
+        }
+    }
+    for (unsigned int i = 0; i <= grid_number; i++)
+    {
+        for (unsigned int pix = 0; pix < SCREEN_WIDTH; pix++)
+        {
+            if (i == grid_number)
+            {
+                * ((int *) surface->pixels + pix + i * STEP_H * SCREEN_WIDTH - SCREEN_WIDTH) = 0; 
+                //SetPixel(surface, pix, i * STEP_H - 1, 0);
+            }
+            else
+            {
+                * ((int *) surface->pixels + pix + i * STEP_H * SCREEN_WIDTH) = 0;
+                //SetPixel(surface, pix, i * STEP_H,dxdx0);
+            }   
+        }       
+    }
+    return;
+}
+void SetPixel(SDL_Surface * surface, int x, int y, int color)
+{
+    /* * ((int *) surface->pixels[] + x + y * surface->w) = color; */   
+    ((int *) surface->pixels)[x + y * surface->w] = color;
+    return;
 }
