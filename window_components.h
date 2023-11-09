@@ -2,8 +2,8 @@
 #define _WINDOW_COMPONENTS_H_
 #pragma once
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 
 typedef struct _app app_t;
 
