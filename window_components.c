@@ -32,12 +32,26 @@ struct _position
     };
 };
 
+typedef enum _flags e_flags;
+typedef union _state t_state;
+
+union _state
+{
+    unsigned char flag : 2;
+};
+
+enum _flags
+{
+    GAME_EXITING, GAME_MENU, GAME_ROUTINE
+};
+
 static char text_fps[FPS_VALUE_ARRAY_SIZE] = "FPS: ";
 
 void SurfaceClearing(SDL_Surface *, SDL_Color const *);
 void TextRendering(app_t *, position *, SDL_Color, const char*);
 char const * IntToStr_vFPS(char *, uint_32);
 void SetPixel(SDL_Surface *, int, int, int);
+void DrawingGrid(unsigned, SDL_Surface *);
 
 app_t * WindowInitialization()
 {
@@ -74,25 +88,81 @@ app_t * WindowInitialization()
 }
 void ScreenRenderingAndUpdating(app_t * app)
 {
-    void DrawingGrid(unsigned, SDL_Surface *);
+    TTF_Font * font_menu_text = TTF_OpenFont("Sans.ttf", 36);
     uint_32 t_start, t_end, t_dl, fps = 0;;
-    SDL_Color bg = {255, 255, 255}, fg = {0, 0, 0};
+    SDL_Color bg = {255, 255, 255}, fg = {0, 0, 0}, color_text_menu = {0xE3, 0x93, 0xF8};;
     uint_8 non_exit = 1;
     SDL_Event event;
-    while (non_exit)
+    
+    static char * text_menu[] = 
+    {
+        "New Game",
+        "Settings",
+        "Exit"
+    };
+
+    SDL_Surface * surf_text_menu_newGame = TTF_RenderText_Blended(font_menu_text, text_menu[0], color_text_menu);
+    SDL_Surface * surf_text_menu_settings = TTF_RenderText_Blended(font_menu_text, text_menu[1], color_text_menu);
+    SDL_Surface * surf_text_menu_exit = TTF_RenderText_Blended(font_menu_text, text_menu[2], color_text_menu);
+
+    SDL_Surface * surf_menu = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0, 0, 0, 0);
+    {
+        #define POS_CENTER_W(SC_W, x) ((SC_W) - (x)) / 2
+        #define POS_CENTER_H(SC_H, y) ((SC_H) - (y)) / 2
+        /* Ask Antony about logic */
+        SDL_BlitSurface(surf_text_menu_newGame, &surf_text_menu_newGame->clip_rect, surf_menu, & (SDL_Rect) {POS_CENTER_W(SCREEN_WIDTH, surf_text_menu_newGame->w), POS_CENTER_H(SCREEN_HEIGHT, surf_text_menu_settings->h) - surf_text_menu_newGame->h, 0, 0});
+        SDL_BlitSurface(surf_text_menu_settings, &surf_text_menu_settings->clip_rect, surf_menu, & (SDL_Rect) {POS_CENTER_W(SCREEN_WIDTH, surf_text_menu_settings->w), POS_CENTER_H(SCREEN_HEIGHT, surf_text_menu_settings->h), 0, 0});
+        SDL_BlitSurface(surf_text_menu_exit, &surf_text_menu_exit->clip_rect, surf_menu, & (SDL_Rect) {POS_CENTER_W(SCREEN_WIDTH, surf_text_menu_exit->w), POS_CENTER_H(SCREEN_HEIGHT, surf_text_menu_settings->h) + surf_text_menu_settings->h, 0, 0});
+        /* #undef POS_CENTER_W
+        #undef POS_CENTER_H */
+    }
+
+    t_state state = {GAME_MENU};
+
+    void FrameMenu(SDL_Surface *, SDL_Surface *);
+    void FrameGame(SDL_Surface *);
+
+    while (state.flag)
     {
         t_start = SDL_GetTicks();
-        while(SDL_PollEvent(&event))
+        while (SDL_PollEvent(&event))
         {
+            /* Ask Ant about SDL */
             if (event.type == SDL_QUIT)
             {
-                non_exit = 0;
+                state.flag = GAME_EXITING;
                 break;
+            }
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                if (state.flag == GAME_MENU && event.button.x >= POS_CENTER_W(SCREEN_WIDTH, surf_text_menu_newGame->w) && event.button.x <= POS_CENTER_W(SCREEN_WIDTH, surf_text_menu_newGame->w) + surf_text_menu_newGame->w && 
+                event.button.y >= POS_CENTER_H(SCREEN_HEIGHT, surf_text_menu_settings->h) - surf_text_menu_newGame->h && event.button.y <= POS_CENTER_H(SCREEN_HEIGHT, surf_text_menu_settings->h))
+                    state.flag = GAME_ROUTINE;
+            }
+            if (event.type == SDL_KEYDOWN)
+            {
+                if (state.flag == GAME_ROUTINE && event.key.keysym.sym == SDLK_ESCAPE)
+                    state.flag = GAME_MENU;
             }
         }
         SurfaceClearing(app->surface, &bg);
-        DrawingGrid(10, app->surface);
-        TextRendering(app, &(position) {.x = 0, 0}, fg, IntToStr_vFPS(text_fps, fps));
+        switch (state.flag)
+        {
+            case GAME_ROUTINE:
+            {
+                FrameGame(app->surface);
+                break;
+            }
+            case GAME_MENU:
+            {
+                FrameMenu(app->surface, surf_menu);
+                break;
+            }
+            default:
+                break;
+        }
+
+        TextRendering(app, &(position) {.x = 0, 0}, (SDL_Color) {255, 0, 0}, IntToStr_vFPS(text_fps, fps));
         SDL_UpdateWindowSurface(app->window);
         t_dl = SDL_GetTicks();
         if (t_dl - t_start < FRAME_DURATION)
@@ -123,6 +193,16 @@ void SurfaceClearing(SDL_Surface * surface, SDL_Color const * color_bg)
             SetPixel(surface, j, i, color_bg->a << 24 | color_bg->r << 16 | color_bg->g << 8 | color_bg->b);
         }
     }
+    return;
+}
+void FrameMenu(SDL_Surface * surface, SDL_Surface * surf_menu)
+{
+    SDL_BlitSurface(surf_menu, &surf_menu->clip_rect, surface, NULL);
+    return;
+}
+void FrameGame(SDL_Surface * surface)
+{
+    DrawingGrid(100, surface);
     return;
 }
 void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char * text)
