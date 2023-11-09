@@ -90,7 +90,7 @@ void ScreenRenderingAndUpdating(app_t * app)
             }
         }
         SurfaceClearing(app->surface, &bg);
-        DrawingGrid(100, app->surface);
+        DrawingGrid(10, app->surface);
         TextRendering(app, &(position) {.x = 0, 0}, fg, IntToStr_vFPS(text_fps, fps));
         SDL_UpdateWindowSurface(app->window);
         t_dl = SDL_GetTicks();
@@ -119,7 +119,7 @@ void SurfaceClearing(SDL_Surface * surface, SDL_Color const * color_bg)
     {
         for (int j = 0; j != SCREEN_WIDTH; j++)
         {
-            *((int*) surface->pixels + j + i * SCREEN_WIDTH) = *(int*) &*color_bg;
+            SetPixel(surface, j, i, color_bg->a << 24 | color_bg->r << 16 | color_bg->g << 8 | color_bg->b);
         }
     }
     return;
@@ -143,7 +143,6 @@ void TextRendering(app_t * app, position * pos, SDL_Color text_color, const char
 }
 char const * IntToStr_vFPS(char * str_value, uint_32 value) 
 {
-    printf("%d\n", value);
     #define START_POS 5
     uint_8 i = START_POS;
     for (; value != 0; i++, value /= 10)
@@ -172,12 +171,10 @@ void DrawingGrid(unsigned grid_number, SDL_Surface * surface)
         {
             if (pix == grid_number)
             {
-                // * ((int *) surface->pixels + i * SCREEN_W + pix * STEP_W - 1) = 0;
                 SetPixel(surface, pix * STEP_W - 1, i, 0);
             }
             else
             {
-                // * ((int *) surface->pixels + i * SCREEN_W + pix * STEP_W) = 0;
                 SetPixel(surface, pix * STEP_W, i, 0);
             }
         }
@@ -188,21 +185,18 @@ void DrawingGrid(unsigned grid_number, SDL_Surface * surface)
         {
             if (i == grid_number)
             {
-                * ((int *) surface->pixels + pix + i * STEP_H * SCREEN_WIDTH - SCREEN_WIDTH) = 0; 
-                //SetPixel(surface, pix, i * STEP_H - 1, 0);
+                SetPixel(surface, pix, i * STEP_H - 1, 0);
             }
             else
             {
-                * ((int *) surface->pixels + pix + i * STEP_H * SCREEN_WIDTH) = 0;
-                //SetPixel(surface, pix, i * STEP_H,dxdx0);
+                SetPixel(surface, pix, i * STEP_H, 0);
             }   
         }       
     }
     return;
 }
 void SetPixel(SDL_Surface * surface, int x, int y, int color)
-{
-    /* * ((int *) surface->pixels[] + x + y * surface->w) = color; */   
+{   
     ((int *) surface->pixels)[x + y * surface->w] = color;
     return;
 }
