@@ -37,6 +37,7 @@ static char text_fps[FPS_VALUE_ARRAY_SIZE] = "FPS: ";
 void SurfaceClearing(SDL_Surface *, SDL_Color const *);
 void TextRendering(app_t *, position *, SDL_Color, const char*);
 char const * IntToStr_vFPS(char *, uint_32);
+void SetPixel(SDL_Surface *, int, int, int);
 
 app_t * WindowInitialization()
 {
