@@ -1,4 +1,7 @@
-#include <stddef.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
+
+#include "fonts.h"
 
 #include "types.h"
 
@@ -8,16 +11,16 @@ bool InsertIntIntoString(char * string_to_insert, uint_32 array_length, int valu
 {
     #define MAX_VALUE_SIZE 32
 
-    if (string_to_insert == NULL)
+    if (string_to_insert == NULL) 
         return FALSE;
 
     char array_IntToStr_value[MAX_VALUE_SIZE];
     const int length_array_IntToStr_value = IntToStr(array_IntToStr_value, value);
-    int template_length;
+    int template_length = 0;
 
     for (; template[template_length] != '\0'; template_length++);
 
-    if (length_array_IntToStr_value + template_length > array_length - 1)
+    if (length_array_IntToStr_value + template_length > (int) array_length - 1)
     {
         string_to_insert[0] = 'E';
         string_to_insert[1] = 'r';
@@ -80,7 +83,7 @@ static uint_32 IntToStr(char array[], int value)
     // Reversing string function
     //
     int tmp_value;
-    while (index < array_length_counter - 1)
+    while (index < array_length_counter - 1U)
     {
         tmp_value = array[index];
         array[index] = array[array_length_counter - 1];
@@ -93,4 +96,22 @@ static uint_32 IntToStr(char array[], int value)
     //
 
     return return_value;
+}
+void RenderText(SDL_Surface * surface, int x, int y, bool centered, const char* text, SDL_Color color)
+{
+    SDL_Surface * surface_text = TTF_RenderText_Solid(font, text, color);
+    if (surface_text == NULL)
+        return;
+
+    SDL_Rect position;
+    if (centered)
+        position = (SDL_Rect){ (x - surface_text->w) / 2, (y - surface_text->h) / 2, surface_text->w, surface_text->h };
+    else
+        position = (SDL_Rect){ x, y, surface_text->w, surface_text->h };
+
+    SDL_BlitSurface(surface_text, NULL, surface, &position);
+
+    SDL_FreeSurface(surface_text);
+
+    return;
 }

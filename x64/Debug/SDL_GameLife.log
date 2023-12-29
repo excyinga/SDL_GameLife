@@ -1,0 +1,4 @@
+﻿  application.c
+C:\Users\Mary\SDL_GameLife\src\application.c(68,35): warning C4244: 'function': conversion from 'const double' to 'int', possible loss of data
+C:\Users\Mary\SDL_GameLife\src\application.c(74,42): warning C4244: 'function': conversion from 'const double' to 'int', possible loss of data
+  SDL_GameLife.vcxproj -> C:\Users\Mary\SDL_GameLife\x64\Debug\SDL_GameLife.exe

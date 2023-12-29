@@ -6,14 +6,18 @@
 #include <SDL2/SDL_mixer.h>
 
 #include "application.h"
+#include "frame_loading.h"
 #include "frame_menu.h"
 
+#include "sound.h"
 #include "fonts.h"
 
 #include "types.h"
 #include "tools.h"
 
-application_t application;
+#define ONE_FRAME_PER_SECOND 1000 / 60 
+
+static application_t application;
 
 bool _game_routine = TRUE;
 
@@ -40,6 +44,11 @@ int main(void)
         printf("SDL_MIXER error: %s\n", Mix_GetError());
         return 1;
     }
+    else if (Mix_OpenAudio(SOUND_FREQUENCY, SOUND_FORMAT, SOUND_CHANNELS, SOUND_CHUNKSIZE))
+    {
+        printf("SDL_Mixer OpenAudio erros: %s\n", Mix_GetError());
+        return 1;
+    }
     
     extern application_t application;
 
@@ -55,20 +64,38 @@ int main(void)
         printf("Surface error: %s\n", SDL_GetError());
         return 1;
     }
-
-    TTF_Font * font = TTF_OpenFont(path_to_font, FONT_SIZE);
+    music = Mix_LoadMUS(path_to_music);
+    if (music == NULL)
+    {
+        printf("Music error: %s\n", Mix_GetError());
+        return 1;
+    }
+    font = TTF_OpenFont(path_to_font, FONT_SIZE);
     if (font == NULL)
     {
         printf("SDL_TTF open font error: %s\n", TTF_GetError());
         return 1;
     }
 
+    unsigned int t_s, t_m, t_e;
+
     // Routine of the game
-/*     while (_game_routine)
+    while (_game_routine)
     {
-        FrameGameLoading(&application);
+        t_s = SDL_GetTicks();
+
+        if (loaded_frames_counter < MENU_FRAMES_AMOUNT)
+            FrameGameLoading(&application);
+        else
+            FrameMenu(&application);
+
+        SDL_UpdateWindowSurface(application.window);
+
+        t_e = SDL_GetTicks();
+        if (t_e - t_s < ONE_FRAME_PER_SECOND)
+            SDL_Delay(ONE_FRAME_PER_SECOND - (t_e - t_s));
     }
- */
+
     return 0;
 }
  

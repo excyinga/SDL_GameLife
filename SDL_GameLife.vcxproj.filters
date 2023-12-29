@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\application.c" />
+    <ClCompile Include="src\fonts.c" />
+    <ClCompile Include="src\frame_loading.c" />
+    <ClCompile Include="src\frame_menu.c" />
+    <ClCompile Include="src\main.c" />
+    <ClCompile Include="src\tools.c" />
+    <ClCompile Include="src\sound.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\application.h" />
+    <ClInclude Include="include\fonts.h" />
+    <ClInclude Include="include\frame_loading.h" />
+    <ClInclude Include="include\frame_menu.h" />
+    <ClInclude Include="include\tools.h" />
+    <ClInclude Include="include\types.h" />
+    <ClInclude Include="include\sound.h" />
+  </ItemGroup>
+</Project>
