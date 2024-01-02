@@ -15,11 +15,13 @@
 #include "types.h"
 #include "tools.h"
 
-#define ONE_FRAME_PER_SECOND 1000 / 60 
+#define MS_PER_FRAME 1000 / 60 
 
 static application_t application;
 
 bool _game_routine = TRUE;
+
+scene current_scene = GAME_LOADING;
 
 int main(void)
 {
@@ -79,21 +81,34 @@ int main(void)
 
     unsigned int t_s, t_m, t_e;
 
+    SDL_Event event;
+
     // Routine of the game
-    while (_game_routine)
+    while (current_scene != GAME_EXITING)
     {
         t_s = SDL_GetTicks();
 
-        if (loaded_frames_counter < MENU_FRAMES_AMOUNT)
-            FrameGameLoading(&application);
-        else
-            FrameMenu(&application);
+        while (SDL_PollEvent(&event))
+        {
+            if (current_scene == GAME_MENU && )
+            {
+                current_scene = GAME_GRID;
+                break;
+            }
+        }
 
+        if (current_scene == GAME_LOADING)
+            FrameGameLoading(&application);
+        else if (current_scene == GAME_MENU)
+            FrameMenu(&application);
+        else if (current_scene == GAME_GRID)
+            FrameGrid(&application);
+            
         SDL_UpdateWindowSurface(application.window);
 
         t_e = SDL_GetTicks();
-        if (t_e - t_s < ONE_FRAME_PER_SECOND)
-            SDL_Delay(ONE_FRAME_PER_SECOND - (t_e - t_s));
+        if (t_e - t_s < MS_PER_FRAME)
+            SDL_Delay(MS_PER_FRAME - (t_e - t_s));
     }
 
     return 0;

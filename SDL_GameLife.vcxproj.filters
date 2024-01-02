@@ -8,6 +8,7 @@
     <ClCompile Include="src\main.c" />
     <ClCompile Include="src\tools.c" />
     <ClCompile Include="src\sound.c" />
+    <ClCompile Include="frame_grid.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\application.h" />
@@ -17,5 +18,6 @@
     <ClInclude Include="include\tools.h" />
     <ClInclude Include="include\types.h" />
     <ClInclude Include="include\sound.h" />
+    <ClInclude Include="frame_grid.h" />
   </ItemGroup>
 </Project>

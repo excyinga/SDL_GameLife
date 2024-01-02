@@ -11,8 +11,6 @@
 #include "types.h"
 #include "tools.h"
 
-extern bool _game_routine;
-
 void FrameGameLoading(application_t * application)
 {
     #define LOADING_TEXT_ARRAY_LENGTH 32
@@ -21,7 +19,7 @@ void FrameGameLoading(application_t * application)
     static bool _loaded_img_load_menu = FALSE; 
     static SDL_Surface * img_bg_loading_menu = NULL;
     
-    static SDL_Color text_color = { 0x00, 0xFF, 0xFF };
+    static SDL_Color text_color = {0x00, 0xFF, 0xFF};
 
     static char loading_text[LOADING_TEXT_ARRAY_LENGTH];
 
@@ -30,7 +28,7 @@ void FrameGameLoading(application_t * application)
         img_bg_loading_menu = IMG_Load(path_to_img_load_menu);
         if (img_bg_loading_menu == NULL)
         {
-            _game_routine = FALSE;
+            current_scene = GAME_EXITING;
             
             return;
         }
@@ -40,6 +38,9 @@ void FrameGameLoading(application_t * application)
         _loaded_img_load_menu = TRUE;
     }
     
+    if (loaded_frames_counter == MENU_FRAMES_AMOUNT)
+        current_scene = GAME_MENU;
+
     SDL_BlitSurface(img_bg_loading_menu, NULL, application->surface, NULL);
 
     InsertIntIntoString(loading_text, LOADING_TEXT_ARRAY_LENGTH, loaded_frames_counter * 100 / MENU_FRAMES_AMOUNT, "Loading: %d/100");
@@ -52,25 +53,29 @@ void FrameGameLoading(application_t * application)
 }
 void FrameMenu(application_t * application)
 {
-    double const MUSIC_FINISH_MS = 15000;
-    double const FADE_OUT_TIME_MS = 15000;
+    double const MUSIC_FINISH_MS = 32000;
+    double const FADE_OUT_TIME_MS = 2000;
 
     static unsigned int music_start_ms = 0;
-
+    static bool _fading = FALSE;
     static int frame_counter = 0;
 
     unsigned int current_position_ms = SDL_GetTicks() - music_start_ms;
 
     if (music_start_ms == 0 || current_position_ms >= MUSIC_FINISH_MS)
     {
-        /*Mix_PlayMusic(music, 1);*/
+        Mix_HaltMusic();
 
-        Mix_FadeInMusic(music, 1, FADE_OUT_TIME_MS);
+        Mix_PlayMusic(music, 1);
+
+        /*Mix_FadeInMusic(music, 1, FADE_OUT_TIME_MS);*/
+        _fading = FALSE;
 
         music_start_ms = SDL_GetTicks();
     }
-    if (current_position_ms >= MUSIC_FINISH_MS - FADE_OUT_TIME_MS)
+    else if (!_fading && current_position_ms >= MUSIC_FINISH_MS - FADE_OUT_TIME_MS)
     {
+        _fading = TRUE;
         Mix_FadeOutMusic(MUSIC_FINISH_MS - current_position_ms);
     }
 
@@ -81,7 +86,19 @@ void FrameMenu(application_t * application)
     if (frame_counter == MENU_FRAMES_AMOUNT)
         frame_counter ^= frame_counter;
 
+    char * text_new_game = "New Game";
+    static SDL_Color text_color = { 0x00, 0xFF, 0xFF };
+
+    RenderText(application->surface, application->surface->w, application->surface->h, TRUE, text_new_game, text_color);
+
     #undef MUSIC_FINISH
+
+    return;
+}
+void FrameGrid(application_t * application)
+{
+    ClearScreen(application);
+    GridDrawing(application, 10);
 
     return;
 }
