@@ -9,8 +9,9 @@
 #define SOUND_CHANNELS		2
 #define SOUND_CHUNKSIZE		2048
 
+extern Mix_Music* music;
+
 extern const char * path_to_music;
-extern Mix_Music * music;
 
 #endif 
 

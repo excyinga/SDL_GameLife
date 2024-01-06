@@ -16,7 +16,7 @@ uint_16 loaded_frames_counter = 0;
 
 int LoadingMenuFrames(void * args)
  {
-    static char path_to_img_frames_of_menu[LENGTH_OF_ARRAY_path_to_img_frames_of_menu] = "./Game Mock-up/game_frames/%d.jpg";
+    static char path_to_img_frames_of_menu[LENGTH_OF_ARRAY_path_to_img_frames_of_menu] = "./resources/frames_menu_bg/%d.jpg";
     static char current_frame[LENGTH_OF_ARRAY_path_to_img_frames_of_menu]; 
 
     for (; loaded_frames_counter < MENU_FRAMES_AMOUNT; loaded_frames_counter++)

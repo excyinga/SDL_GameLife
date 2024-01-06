@@ -4,8 +4,8 @@
 
 #include "types.h"
 
-extern uint_16 loaded_frames_counter;
-
 int LoadingMenuFrames(void * args);
+
+extern uint_16 loaded_frames_counter;
 
 #endif

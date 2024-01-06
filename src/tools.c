@@ -1,6 +1,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "application.h"
+
 #include "fonts.h"
 
 #include "types.h"
@@ -11,11 +13,9 @@ bool InsertIntIntoString(char * string_to_insert, uint_32 array_length, int valu
 {
     #define MAX_VALUE_SIZE 32
 
-    if (string_to_insert == NULL) 
-        return FALSE;
-
     char array_IntToStr_value[MAX_VALUE_SIZE];
     const int length_array_IntToStr_value = IntToStr(array_IntToStr_value, value);
+
     int template_length = 0;
 
     for (; template[template_length] != '\0'; template_length++);
@@ -38,6 +38,7 @@ bool InsertIntIntoString(char * string_to_insert, uint_32 array_length, int valu
         {
             for (int k = 0; k < length_array_IntToStr_value; k++, j++)
                 string_to_insert[j] = array_IntToStr_value[k];
+
             j = j - 1;
             i = i + 1;
         }
@@ -56,14 +57,16 @@ static uint_32 IntToStr(char array[], int value)
     {
         array[0] = '0';
         array[1] = '\0';
+
         return 1;
     }
 
     bool _is_negative = value < 0 ? TRUE : FALSE;
 
     uint_8 array_length_counter = 0;
-    int_8 negative = 1;
     uint_32 index = 0;
+
+    int_8 negative = 1;
 
     if (_is_negative)
     {
@@ -105,13 +108,19 @@ void RenderText(SDL_Surface * surface, int x, int y, bool centered, const char* 
 
     SDL_Rect position;
     if (centered)
-        position = (SDL_Rect){ (x - surface_text->w) / 2, (y - surface_text->h) / 2, surface_text->w, surface_text->h };
+        position = (SDL_Rect) {(x - surface_text->w) / 2, (y - surface_text->h) / 2, surface_text->w, surface_text->h};
     else
-        position = (SDL_Rect){ x, y, surface_text->w, surface_text->h };
+        position = (SDL_Rect) {x, y, surface_text->w, surface_text->h};
 
     SDL_BlitSurface(surface_text, NULL, surface, &position);
 
     SDL_FreeSurface(surface_text);
+
+    return;
+}
+void SetPixel(void * surface, int x, int y, SDL_Color pixel_color)
+{
+    *((int *) ((SDL_Surface *) surface)->pixels + x + y * ((SDL_Surface*) surface)->pitch / 4) = *(int *) &pixel_color;
 
     return;
 }

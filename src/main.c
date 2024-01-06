@@ -88,14 +88,14 @@ int main(void)
     {
         t_s = SDL_GetTicks();
 
-        while (SDL_PollEvent(&event))
+        /* while (SDL_PollEvent(&event))
         {
             if (current_scene == GAME_MENU && )
             {
                 current_scene = GAME_GRID;
                 break;
             }
-        }
+        } */
 
         if (current_scene == GAME_LOADING)
             FrameGameLoading(&application);
@@ -107,6 +107,7 @@ int main(void)
         SDL_UpdateWindowSurface(application.window);
 
         t_e = SDL_GetTicks();
+
         if (t_e - t_s < MS_PER_FRAME)
             SDL_Delay(MS_PER_FRAME - (t_e - t_s));
     }

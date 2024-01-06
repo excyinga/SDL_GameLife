@@ -1,23 +1,63 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="src\application.c" />
-    <ClCompile Include="src\fonts.c" />
-    <ClCompile Include="src\frame_loading.c" />
-    <ClCompile Include="src\frame_menu.c" />
-    <ClCompile Include="src\main.c" />
-    <ClCompile Include="src\tools.c" />
-    <ClCompile Include="src\sound.c" />
-    <ClCompile Include="frame_grid.c" />
+    <ClCompile Include="src\application.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fonts.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frame_loading.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frame_menu.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\frame_grid.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sound.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tools.c">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\application.h" />
-    <ClInclude Include="include\fonts.h" />
-    <ClInclude Include="include\frame_loading.h" />
-    <ClInclude Include="include\frame_menu.h" />
-    <ClInclude Include="include\tools.h" />
-    <ClInclude Include="include\types.h" />
-    <ClInclude Include="include\sound.h" />
-    <ClInclude Include="frame_grid.h" />
+    <ClInclude Include="include\application.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fonts.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\frame_grid.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\frame_loading.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\frame_menu.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\sound.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\tools.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\types.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{a23024c2-2ce6-4185-922c-5ed0129d48aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{706e3f2e-0439-414d-badc-b58d6caab559}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

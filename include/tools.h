@@ -8,5 +8,6 @@
 
 bool InsertIntIntoString(char * string_to_insert, uint_32 array_length, int value, const char template[]);
 void RenderText(SDL_Surface * surface, int x, int y, bool centered, const char * text, SDL_Color color);
+void SetPixel(void * surface, int x, int y, SDL_Color pixel_color);
 
 #endif

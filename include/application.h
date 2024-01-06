@@ -6,13 +6,12 @@
 
 #include "types.h"
 
-#define APP_WINDOW_WIDTH    1920
-#define APP_WINDOW_HEIGHT   1080
+#define APP_WINDOW_WIDTH    1200
+#define APP_WINDOW_HEIGHT   800
 
 typedef enum scene scene;
 
-extern bool _game_routine;
-extern scene current_scene;
+typedef struct application_t application_t;
 
 enum scene
 {
@@ -22,14 +21,18 @@ enum scene
     GAME_EXITING
 };
 
-typedef struct
+struct application_t
 {
     SDL_Window * window;
     SDL_Surface * surface;
-} application_t;
+};
 
 void FrameGameLoading(application_t * application);
 void FrameMenu(application_t * application);
 void FrameGrid(application_t * application);
+
+extern bool _game_routine;
+
+extern scene current_scene;
 
 #endif

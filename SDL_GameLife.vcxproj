@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="frame_grid.c" />
     <ClCompile Include="src\application.c" />
     <ClCompile Include="src\fonts.c" />
+    <ClCompile Include="src\frame_grid.c" />
     <ClCompile Include="src\frame_loading.c" />
     <ClCompile Include="src\frame_menu.c" />
     <ClCompile Include="src\main.c" />
@@ -29,9 +29,9 @@
     <ClCompile Include="src\tools.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="frame_grid.h" />
     <ClInclude Include="include\application.h" />
     <ClInclude Include="include\fonts.h" />
+    <ClInclude Include="include\frame_grid.h" />
     <ClInclude Include="include\frame_loading.h" />
     <ClInclude Include="include\frame_menu.h" />
     <ClInclude Include="include\sound.h" />

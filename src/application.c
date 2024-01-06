@@ -39,7 +39,7 @@ void FrameGameLoading(application_t * application)
     }
     
     if (loaded_frames_counter == MENU_FRAMES_AMOUNT)
-        current_scene = GAME_MENU;
+        current_scene = GAME_GRID;
 
     SDL_BlitSurface(img_bg_loading_menu, NULL, application->surface, NULL);
 
@@ -53,31 +53,7 @@ void FrameGameLoading(application_t * application)
 }
 void FrameMenu(application_t * application)
 {
-    double const MUSIC_FINISH_MS = 32000;
-    double const FADE_OUT_TIME_MS = 2000;
-
-    static unsigned int music_start_ms = 0;
-    static bool _fading = FALSE;
     static int frame_counter = 0;
-
-    unsigned int current_position_ms = SDL_GetTicks() - music_start_ms;
-
-    if (music_start_ms == 0 || current_position_ms >= MUSIC_FINISH_MS)
-    {
-        Mix_HaltMusic();
-
-        Mix_PlayMusic(music, 1);
-
-        /*Mix_FadeInMusic(music, 1, FADE_OUT_TIME_MS);*/
-        _fading = FALSE;
-
-        music_start_ms = SDL_GetTicks();
-    }
-    else if (!_fading && current_position_ms >= MUSIC_FINISH_MS - FADE_OUT_TIME_MS)
-    {
-        _fading = TRUE;
-        Mix_FadeOutMusic(MUSIC_FINISH_MS - current_position_ms);
-    }
 
     SDL_BlitSurface(array_of_menu_frames[frame_counter], NULL, application->surface, NULL);
 
@@ -91,13 +67,10 @@ void FrameMenu(application_t * application)
 
     RenderText(application->surface, application->surface->w, application->surface->h, TRUE, text_new_game, text_color);
 
-    #undef MUSIC_FINISH
-
     return;
 }
 void FrameGrid(application_t * application)
 {
-    ClearScreen(application);
     GridDrawing(application, 10);
 
     return;

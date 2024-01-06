@@ -6,7 +6,6 @@
 
 #include "types.h"
 
-void ClearScreen(application_t * application);
 void GridDrawing(application_t * application, uint_16 grid_amount);
 
 #endif
