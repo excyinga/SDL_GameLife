@@ -48,5 +48,6 @@ void GridDrawing(application_t * application, uint_16 grid_amount)
 				SetPixel(application->surface, x, GRID_STEP_Y * grid_counter, grid_color);
 		}
 	}
+
 	return;
 }

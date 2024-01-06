@@ -28,7 +28,7 @@ void FrameGameLoading(application_t * application)
         img_bg_loading_menu = IMG_Load(path_to_img_load_menu);
         if (img_bg_loading_menu == NULL)
         {
-            current_scene = GAME_EXITING;
+            application->current_scene = GAME_EXITING;
             
             return;
         }
@@ -39,13 +39,13 @@ void FrameGameLoading(application_t * application)
     }
     
     if (loaded_frames_counter == MENU_FRAMES_AMOUNT)
-        current_scene = GAME_GRID;
+        application->current_scene = GAME_MENU;
 
     SDL_BlitSurface(img_bg_loading_menu, NULL, application->surface, NULL);
 
     InsertIntIntoString(loading_text, LOADING_TEXT_ARRAY_LENGTH, loaded_frames_counter * 100 / MENU_FRAMES_AMOUNT, "Loading: %d/100");
 
-    RenderText(application->surface, APP_WINDOW_WIDTH, APP_WINDOW_HEIGHT, TRUE, loading_text, text_color);
+    RenderText(application, APP_WINDOW_WIDTH, APP_WINDOW_HEIGHT, TRUE, loading_text, text_color);
 
     #undef LOADING_TEXT_ARRAY_LENGTH
 
@@ -63,9 +63,14 @@ void FrameMenu(application_t * application)
         frame_counter ^= frame_counter;
 
     char * text_new_game = "New Game";
-    static SDL_Color text_color = { 0x00, 0xFF, 0xFF };
+    static SDL_Color text_color = {0x00, 0xFF, 0xFF};
 
-    RenderText(application->surface, application->surface->w, application->surface->h, TRUE, text_new_game, text_color);
+    bool choice = RenderText(application, application->surface->w, application->surface->h, TRUE, text_new_game, text_color);
+ 
+    printf("Choice: %d\n", choice);
+
+    if (application->game_events.clicked && choice)
+        application->current_scene = GAME_GRID;
 
     return;
 }

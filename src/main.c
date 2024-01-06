@@ -84,24 +84,27 @@ int main(void)
     SDL_Event event;
 
     // Routine of the game
-    while (current_scene != GAME_EXITING)
+    while (application.current_scene != GAME_EXITING)
     {
         t_s = SDL_GetTicks();
 
-        /* while (SDL_PollEvent(&event))
+        while (SDL_PollEvent(&event))
         {
-            if (current_scene == GAME_MENU && )
-            {
-                current_scene = GAME_GRID;
-                break;
-            }
-        } */
+            if (event.type == SDL_QUIT)
+                application.current_scene = GAME_EXITING;
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+                application.game_events.clicked = TRUE;
+            else if (event.type == SDL_MOUSEBUTTONUP)
+                application.game_events.clicked = FALSE;
+        }
 
-        if (current_scene == GAME_LOADING)
+        SDL_GetMouseState(&application.game_events.position.x, &application.game_events.position.y);
+
+        if (application.current_scene == GAME_LOADING)
             FrameGameLoading(&application);
-        else if (current_scene == GAME_MENU)
+        else if (application.current_scene == GAME_MENU)
             FrameMenu(&application);
-        else if (current_scene == GAME_GRID)
+        else if (application.current_scene == GAME_GRID)
             FrameGrid(&application);
             
         SDL_UpdateWindowSurface(application.window);

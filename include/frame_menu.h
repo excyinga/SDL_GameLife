@@ -14,21 +14,10 @@ typedef struct menu_events_t menu_events_t;
 
 enum game_menu_button
 {
-	NOT_CLICKED,
+	NOT_CHOSE,
 	NEW_GAME_BUTTON,
-	SETTINGS,
-	EXITING
-};
-
-struct menu_events
-{
-	struct
-	{
-		int x;
-		int y;
-	} position;
-	
-	game_menu_button clicked_button;
+	SETTINGS_BUTTON,
+	EXITING_BUTTON
 };
 
 extern SDL_Surface * array_of_menu_frames[];

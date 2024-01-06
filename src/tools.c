@@ -8,6 +8,7 @@
 #include "types.h"
 
 static uint_32 IntToStr(char [], int);
+bool IsInRect(int x, int y, SDL_Rect rect);
 
 bool InsertIntIntoString(char * string_to_insert, uint_32 array_length, int value, const char template[])
 {
@@ -100,11 +101,9 @@ static uint_32 IntToStr(char array[], int value)
 
     return return_value;
 }
-void RenderText(SDL_Surface * surface, int x, int y, bool centered, const char* text, SDL_Color color)
+bool RenderText(application_t * application, int x, int y, bool centered, const char * text, SDL_Color color)
 {
     SDL_Surface * surface_text = TTF_RenderText_Solid(font, text, color);
-    if (surface_text == NULL)
-        return;
 
     SDL_Rect position;
     if (centered)
@@ -112,15 +111,23 @@ void RenderText(SDL_Surface * surface, int x, int y, bool centered, const char* 
     else
         position = (SDL_Rect) {x, y, surface_text->w, surface_text->h};
 
-    SDL_BlitSurface(surface_text, NULL, surface, &position);
+    SDL_BlitSurface(surface_text, NULL, application->surface, &position);
 
     SDL_FreeSurface(surface_text);
 
-    return;
+    return IsInRect(application->game_events.position.x, application->game_events.position.y, position);
 }
 void SetPixel(void * surface, int x, int y, SDL_Color pixel_color)
 {
-    *((int *) ((SDL_Surface *) surface)->pixels + x + y * ((SDL_Surface*) surface)->pitch / 4) = *(int *) &pixel_color;
+    *((int *) ((SDL_Surface *) surface)->pixels + x + y * ((SDL_Surface *) surface)->pitch / 4) = *(int *) &pixel_color;
 
     return;
+}
+bool IsInRect(int x, int y, SDL_Rect rect)
+{
+    return (
+                x >= rect.x && x <= rect.x + rect.w
+                &&
+                y >= rect.y && y <= rect.y + rect.h
+            );
 }
