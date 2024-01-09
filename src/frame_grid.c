@@ -1,6 +1,10 @@
+#include <stdio.h>
+
 #include <SDL2/SDL.h>
 
 #include "application.h"
+
+extern uint_16 loaded_frames_counter;
 
 #include "tools.h"
 #include "types.h"
@@ -20,7 +24,8 @@ void GridDrawing(application_t * application, uint_16 grid_amount)
 {
 	ClearScreen(application);
 
-	SDL_Color grid_color = {0, 255, 255};
+	SDL_Color grid_color = {255, 0, 0};
+	SDL_Color cell_color = {.b = 0xFF};
 
 	const int GRID_STEP_X = application->surface->w / grid_amount;
 	const int GRID_STEP_Y = application->surface->h / grid_amount;
@@ -46,6 +51,33 @@ void GridDrawing(application_t * application, uint_16 grid_amount)
 				SetPixel(application->surface, x, GRID_STEP_Y * grid_counter - 1, grid_color);
 			else
 				SetPixel(application->surface, x, GRID_STEP_Y * grid_counter, grid_color);
+		}
+	}
+
+	int padding = 1;
+	SDL_Rect cell_coordinate_position;
+
+	for (uint_32 y = 0; y < application->my_grid.size; y++)
+	{
+		for (uint_32 x = 0; x < application->my_grid.size; x++)
+		{
+			cell_coordinate_position.x = x * GRID_STEP_X + padding;
+			cell_coordinate_position.y = y * GRID_STEP_Y + padding;
+			cell_coordinate_position.w = GRID_STEP_X - padding * 2;
+			cell_coordinate_position.h = GRID_STEP_Y - padding * 2;
+			if (IsInRect(
+				application->game_events.position.x,
+				application->game_events.position.y,
+				cell_coordinate_position)
+				&& application->game_events.clicked
+				)
+			{
+				SetCell(x, y, !GetCell(x, y, application->my_grid), application->my_grid);
+			}
+			if (GetCell(x, y, application->my_grid))
+			{
+				FillRect(application->surface, cell_coordinate_position, cell_color);
+			}
 		}
 	}
 

@@ -21,8 +21,6 @@ static application_t application;
 
 bool _game_routine = TRUE;
 
-scene current_scene = GAME_LOADING;
-
 int main(void)
 {
     //Init SDL components
@@ -82,29 +80,39 @@ int main(void)
     unsigned int t_s, t_m, t_e;
 
     SDL_Event event;
-
+    
+    application.my_grid = AllocGridData(GRID_AMOUNT);
+    for (int i = 0; i < application.my_grid.size * application.my_grid.size; i++)
+        application.my_grid.cells[i] = FALSE;
+    
+    bool mouse_down = FALSE;
+    
     // Routine of the game
-    while (application.current_scene != GAME_EXITING)
+    while (application.scene != GAME_EXITING)
     {
         t_s = SDL_GetTicks();
+
+        application.game_events.clicked = FALSE;
 
         while (SDL_PollEvent(&event))
         {
             if (event.type == SDL_QUIT)
-                application.current_scene = GAME_EXITING;
+                application.scene = GAME_EXITING;
             if (event.type == SDL_MOUSEBUTTONDOWN)
-                application.game_events.clicked = TRUE;
+                mouse_down = TRUE;
             else if (event.type == SDL_MOUSEBUTTONUP)
-                application.game_events.clicked = FALSE;
+            {
+                application.game_events.clicked = TRUE;
+            }
         }
 
         SDL_GetMouseState(&application.game_events.position.x, &application.game_events.position.y);
 
-        if (application.current_scene == GAME_LOADING)
+        if (application.scene == GAME_LOADING)
             FrameGameLoading(&application);
-        else if (application.current_scene == GAME_MENU)
+        else if (application.scene == GAME_MENU)
             FrameMenu(&application);
-        else if (application.current_scene == GAME_GRID)
+        else if (application.scene == GAME_GRID)
             FrameGrid(&application);
             
         SDL_UpdateWindowSurface(application.window);

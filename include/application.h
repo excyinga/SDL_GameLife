@@ -9,43 +9,49 @@
 #define APP_WINDOW_WIDTH    1200
 #define APP_WINDOW_HEIGHT   800
 
-typedef enum scene scene;
+#define GRID_AMOUNT 10
 
-typedef struct current_game_events current_game_events;
 typedef struct application_t application_t;
 
-enum scene
+typedef struct
 {
-    GAME_LOADING = 0,
-    GAME_MENU,
-    GAME_GRID,
-    GAME_EXITING
-};
-
-struct current_game_events
-{
-	struct
-	{
-		int x;
-		int y;
-	} position;
-
-    bool clicked : 1;
-};
+    int size;
+    bool * cells;
+} grid_data;
 
 struct application_t
 {
     SDL_Window * window;
     SDL_Surface * surface;
 
-    current_game_events game_events;
+    struct 
+    {
+        struct
+        {
+            int x;
+            int y;
+        } position;
 
-    scene current_scene;
+        bool clicked : 1;
+    } game_events;
+
+    enum scene
+    {
+        GAME_LOADING = 0,
+        GAME_MENU,
+        GAME_GRID,
+        GAME_EXITING
+    } scene;
+
+    grid_data my_grid;
 };
 
 void FrameGameLoading(application_t * application);
 void FrameMenu(application_t * application);
 void FrameGrid(application_t * application);
+grid_data AllocGridData(int size);
+bool GetCell(int x, int y, grid_data data);
+void SetCell(int x, int y, bool state, grid_data data);
 
 extern bool _game_routine;
 

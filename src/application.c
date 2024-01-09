@@ -28,7 +28,7 @@ void FrameGameLoading(application_t * application)
         img_bg_loading_menu = IMG_Load(path_to_img_load_menu);
         if (img_bg_loading_menu == NULL)
         {
-            application->current_scene = GAME_EXITING;
+            application->scene = GAME_EXITING;
             
             return;
         }
@@ -39,7 +39,7 @@ void FrameGameLoading(application_t * application)
     }
     
     if (loaded_frames_counter == MENU_FRAMES_AMOUNT)
-        application->current_scene = GAME_MENU;
+        application->scene = GAME_MENU;
 
     SDL_BlitSurface(img_bg_loading_menu, NULL, application->surface, NULL);
 
@@ -66,17 +66,30 @@ void FrameMenu(application_t * application)
     static SDL_Color text_color = {0x00, 0xFF, 0xFF};
 
     bool choice = RenderText(application, application->surface->w, application->surface->h, TRUE, text_new_game, text_color);
- 
-    printf("Choice: %d\n", choice);
 
     if (application->game_events.clicked && choice)
-        application->current_scene = GAME_GRID;
+        application->scene = GAME_GRID;
 
     return;
 }
 void FrameGrid(application_t * application)
 {
-    GridDrawing(application, 10);
+    GridDrawing(application, application->my_grid.size);
+
+    return;
+}
+grid_data AllocGridData(int size)
+{
+    grid_data my_grid = {.size = size, .cells = malloc(sizeof(bool) * size * size)};
+    return my_grid;
+}
+bool GetCell(int x, int y, grid_data data)
+{
+    return data.cells[y * data.size + x];
+}
+void SetCell(int x, int y, bool state, grid_data data)
+{
+    data.cells[y * data.size + x] = state;
 
     return;
 }

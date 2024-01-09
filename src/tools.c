@@ -117,17 +117,34 @@ bool RenderText(application_t * application, int x, int y, bool centered, const 
 
     return IsInRect(application->game_events.position.x, application->game_events.position.y, position);
 }
-void SetPixel(void * surface, int x, int y, SDL_Color pixel_color)
+void SetPixel(SDL_Surface * surface, int x, int y, SDL_Color pixel_color)
 {
-    *((int *) ((SDL_Surface *) surface)->pixels + x + y * ((SDL_Surface *) surface)->pitch / 4) = *(int *) &pixel_color;
+    int color = SdlColorToInt(pixel_color);
+    * ((int *) surface->pixels + x + y * surface->pitch / 4) = color;
 
     return;
 }
 bool IsInRect(int x, int y, SDL_Rect rect)
 {
     return (
-                x >= rect.x && x <= rect.x + rect.w
+                x >= rect.x && x < rect.x + rect.w
                 &&
-                y >= rect.y && y <= rect.y + rect.h
-            );
+                y >= rect.y && y < rect.y + rect.h
+           );
+}
+void FillRect(SDL_Surface * surface, SDL_Rect rect, SDL_Color color)
+{
+    for (int y = rect.y; y < rect.y + rect.h; y++)
+    {
+        for (int x = rect.x; x < rect.x + rect.w; x++)
+        {
+            SetPixel(surface, x, y, color);
+        }
+    }
+
+    return;
+}
+int SdlColorToInt(SDL_Color color)
+{
+    return color.r << 16 | color.g << 8 | color.b;
 }
