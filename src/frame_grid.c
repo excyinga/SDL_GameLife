@@ -63,8 +63,8 @@ void GridDrawing(application_t * application, uint_16 grid_amount)
 		{
 			cell_coordinate_position.x = x * GRID_STEP_X + padding;
 			cell_coordinate_position.y = y * GRID_STEP_Y + padding;
-			cell_coordinate_position.w = GRID_STEP_X - padding * 2;
-			cell_coordinate_position.h = GRID_STEP_Y - padding * 2;
+			cell_coordinate_position.w = GRID_STEP_X - padding;
+			cell_coordinate_position.h = GRID_STEP_Y - padding;
 			if (IsInRect(
 				application->game_events.position.x,
 				application->game_events.position.y,

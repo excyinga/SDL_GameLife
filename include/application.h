@@ -6,8 +6,8 @@
 
 #include "types.h"
 
-#define APP_WINDOW_WIDTH    1200
-#define APP_WINDOW_HEIGHT   800
+#define APP_WINDOW_WIDTH    1920
+#define APP_WINDOW_HEIGHT   1080
 
 #define GRID_AMOUNT 10
 
